@@ -3,13 +3,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 let currentSchema = null;
+let customFieldChips = []; // { name: string, required: boolean }
 
 // ─── Init ─────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthStatus();
 
-    // Handle auth redirect
     const params = new URLSearchParams(window.location.search);
     if (params.has('auth')) {
         const status = params.get('auth');
@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({}, '', '/');
     }
 });
+
+// ─── Page Navigation ──────────────────────────────────────────────────────
+
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(`page-${page}`).classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────
 
@@ -36,7 +44,7 @@ async function checkAuthStatus() {
             badge.className = 'auth-badge connected';
             badge.querySelector('.auth-text').textContent = 'Google Connected';
             btn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         Connected
       `;
             btn.disabled = true;
@@ -57,11 +65,59 @@ async function connectGoogle() {
         if (data.url) {
             window.location.href = data.url;
         } else {
-            showToast('Failed to get auth URL. Check your Google credentials in .env', 'error');
+            showToast('Failed to get auth URL. Check Google credentials in .env', 'error');
         }
     } catch (e) {
         showToast('Failed to connect to server.', 'error');
     }
+}
+
+// ─── Custom Field Chips ───────────────────────────────────────────────────
+
+function addField() {
+    const input = document.getElementById('field-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    // Prevent duplicates (case-insensitive)
+    if (customFieldChips.some(c => c.name.toLowerCase() === val.toLowerCase())) {
+        showToast('Field already added.', 'error');
+        return;
+    }
+
+    customFieldChips.push({ name: val, required: false });
+    input.value = '';
+    input.focus();
+    renderChips();
+}
+
+function removeField(index) {
+    customFieldChips.splice(index, 1);
+    renderChips();
+}
+
+function toggleRequired(index) {
+    customFieldChips[index].required = !customFieldChips[index].required;
+    renderChips();
+}
+
+function renderChips() {
+    const container = document.getElementById('chips-container');
+    if (customFieldChips.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = customFieldChips.map((chip, i) => `
+    <div class="chip ${chip.required ? 'chip-required' : ''}">
+      <button class="chip-star" onclick="toggleRequired(${i})" title="${chip.required ? 'Click to make optional' : 'Click to make required'}">
+        ${chip.required ? '★' : '☆'}
+      </button>
+      <span class="chip-name">${chip.name}</span>
+      <span class="chip-tag">${chip.required ? 'Required' : 'Optional'}</span>
+      <button class="chip-remove" onclick="removeField(${i})" title="Remove field">×</button>
+    </div>
+  `).join('');
 }
 
 // ─── Stage 1: Parse Event ─────────────────────────────────────────────────
@@ -77,11 +133,18 @@ async function parseEvent() {
     btn.classList.add('loading');
     btn.disabled = true;
 
+    // Build custom & required fields from chips
+    const allCustom = customFieldChips.map(c => c.name);
+    const requiredOnly = customFieldChips.filter(c => c.required).map(c => c.name);
+
+    const customFields = allCustom.length > 0 ? allCustom.join('\n') : '';
+    const requiredFields = requiredOnly.length > 0 ? requiredOnly.join(', ') : '';
+
     try {
         const res = await fetch('/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({ text, customFields, requiredFields }),
         });
 
         const data = await res.json();
@@ -104,11 +167,9 @@ async function parseEvent() {
 // ─── Render Preview ───────────────────────────────────────────────────────
 
 function renderPreview(schema) {
-    // Show step 2
     document.getElementById('step2').classList.remove('hidden');
     document.getElementById('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Event badges
     const badges = document.getElementById('event-badges');
     badges.innerHTML = `
     <span class="event-badge ${schema.eventType === 'SOLO' ? 'event-badge-solo' : 'event-badge-team'}">
@@ -121,7 +182,6 @@ function renderPreview(schema) {
     </span>
   `;
 
-    // Summary grid — extract from description
     const summaryGrid = document.getElementById('summary-grid');
     const summaryItems = extractSummaryFromDescription(schema.description);
     summaryGrid.innerHTML = summaryItems.map(item => `
@@ -131,7 +191,6 @@ function renderPreview(schema) {
     </div>
   `).join('');
 
-    // Fields list
     const fieldsList = document.getElementById('fields-list');
     fieldsList.innerHTML = schema.fields.map(field => {
         const isSection = field.type === 'SECTION_HEADER';
@@ -156,24 +215,28 @@ function renderPreview(schema) {
     `;
     }).join('');
 
-    // JSON preview
     document.getElementById('json-preview').textContent = JSON.stringify(schema, null, 2);
 }
 
 function extractSummaryFromDescription(desc) {
     const items = [];
     const patterns = [
-        { regex: /EVENT MODE[:\s]*(.+)/i, label: 'Mode' },
-        { regex: /EVENT DATE[:\s]*(.+)/i, label: 'Date' },
-        { regex: /REGISTRATION DEADLINE[:\s]*(.+)/i, label: 'Deadline' },
-        { regex: /PRIZE MONEY[:\s]*(.+)/i, label: 'Prize' },
-        { regex: /TEAM SIZE[:\s]*(.+)/i, label: 'Team Size' },
+        { regex: /Mode[:\s]*(.+)/i, label: 'Mode' },
+        { regex: /Date[:\s]*(.+)/i, label: 'Date' },
+        { regex: /Deadline[:\s]*(.+)/i, label: 'Deadline' },
+        { regex: /Prize Pool[:\s]*(.+)/i, label: 'Prize' },
+        { regex: /Team Size[:\s]*(.+)/i, label: 'Team Size' },
+        { regex: /Fee[:\s]*(.+)/i, label: 'Fee' },
     ];
 
     for (const p of patterns) {
         const match = desc.match(p.regex);
         if (match) {
-            items.push({ label: p.label, value: match[1].trim() });
+            // Clean up emoji prefixes like 🔹
+            const val = match[1].trim().replace(/^[🔹📍📅⏰🏆👥💰]\s*/g, '');
+            if (val && val.length > 0) {
+                items.push({ label: p.label, value: val });
+            }
         }
     }
 
@@ -254,7 +317,10 @@ function renderResult(data) {
 
 function restart() {
     currentSchema = null;
+    customFieldChips = [];
     document.getElementById('event-text').value = '';
+    document.getElementById('field-input').value = '';
+    renderChips();
     document.getElementById('step2').classList.add('hidden');
     document.getElementById('step3').classList.add('hidden');
     document.getElementById('step1').scrollIntoView({ behavior: 'smooth', block: 'start' });

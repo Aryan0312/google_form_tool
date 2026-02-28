@@ -9,7 +9,7 @@ export async function generateFormSchema(
     next: NextFunction
 ): Promise<void> {
     try {
-        const { text } = req.body;
+        const { text, customFields, requiredFields } = req.body;
 
         if (!text || typeof text !== 'string' || text.trim().length === 0) {
             res.status(400).json({
@@ -19,7 +19,11 @@ export async function generateFormSchema(
             return;
         }
 
-        const schema = await parseEventText(text);
+        const schema = await parseEventText(
+            text,
+            customFields || '',
+            requiredFields || ''
+        );
 
         res.json({
             success: true,
