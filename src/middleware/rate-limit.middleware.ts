@@ -37,3 +37,15 @@ export const authRateLimiter = rateLimit({
         error: 'Too many authentication attempts. Please wait before trying again.',
     },
 });
+
+/** Reminder creation — heavy (Drive + Calendar) */
+export const reminderCreateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        success: false,
+        error: 'Too many reminder creation requests. Please wait before trying again.',
+    },
+});

@@ -343,3 +343,194 @@ function showToast(message, type = '') {
         toast.classList.remove('visible');
     }, 3500);
 }
+
+// ─── Reminder System ──────────────────────────────────────────────────────
+
+let currentReminderDrafts = null;
+
+async function previewReminders() {
+    if (!currentSchema) {
+        showToast('No form schema available. Parse an event first.', 'error');
+        return;
+    }
+
+    // Build rounds from schema
+    const rounds = [];
+    if (currentSchema.rounds && currentSchema.rounds.length > 0) {
+        for (const r of currentSchema.rounds) {
+            if (r.date) {
+                rounds.push({
+                    roundName: r.name,
+                    roundDate: r.date,
+                    roundTime: r.time || undefined,
+                });
+            }
+        }
+    }
+
+    if (rounds.length === 0) {
+        const hasRoundsWithoutDates = currentSchema.rounds && currentSchema.rounds.length > 0;
+        if (hasRoundsWithoutDates) {
+            showToast('Rounds found but none have dates. AI could not extract dates from the event text.', 'error');
+        } else {
+            showToast('No rounds or dates detected in this event. Reminders require at least one round with a date.', 'error');
+        }
+        return;
+    }
+
+    const btn = document.getElementById('reminder-btn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/reminders/preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                eventName: currentSchema.title.replace(' - Registration Form', ''),
+                rounds,
+            }),
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Preview failed.');
+
+        currentReminderDrafts = data.data;
+        renderReminderPreview(data.data);
+        document.getElementById('reminder-modal').classList.remove('hidden');
+        showToast('Reminder previews generated!', 'success');
+    } catch (e) {
+        showToast(e.message || 'Failed to generate reminders.', 'error');
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+}
+
+function renderReminderPreview(data) {
+    const body = document.getElementById('reminder-modal-body');
+    const footer = document.getElementById('reminder-modal-footer');
+    const title = document.getElementById('reminder-modal-title');
+    title.textContent = `Reminder Preview — ${data.eventName}`;
+
+    body.innerHTML = data.reminders.map((r, i) => `
+    <div class="reminder-card">
+      <div class="reminder-card-header">
+        <span class="reminder-round-name">${escapeHtml(r.roundName)}</span>
+        <span class="reminder-round-date">${escapeHtml(r.roundDate)}</span>
+      </div>
+      <label class="reminder-label">Subject</label>
+      <input class="reminder-subject-input" id="reminder-subject-${i}" value="${escapeHtml(r.subject)}" />
+      <label class="reminder-label">Body</label>
+      <textarea class="reminder-body-input" id="reminder-body-${i}" rows="8">${escapeHtml(r.body)}</textarea>
+    </div>
+  `).join('');
+
+    // Show confirm button
+    footer.style.display = '';
+    document.getElementById('confirm-reminders-btn').style.display = '';
+}
+
+async function confirmReminders() {
+    if (!currentReminderDrafts) return;
+
+    // Collect (potentially edited) drafts from the modal inputs
+    const reminders = currentReminderDrafts.reminders.map((r, i) => ({
+        roundName: r.roundName,
+        roundDate: r.roundDate,
+        subject: document.getElementById(`reminder-subject-${i}`).value,
+        body: document.getElementById(`reminder-body-${i}`).value,
+    }));
+
+    const btn = document.getElementById('confirm-reminders-btn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/reminders/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                eventName: currentReminderDrafts.eventName,
+                reminders,
+            }),
+        });
+
+        const data = await res.json();
+        if (!data.success && !data.overallSuccess) {
+            throw new Error(data.error || 'Reminder creation failed.');
+        }
+
+        renderReminderResult(data.data);
+        showToast(`Reminders created! ${data.data.summary.succeeded} succeeded, ${data.data.summary.skipped} skipped.`, 'success');
+    } catch (e) {
+        showToast(e.message || 'Failed to create reminders.', 'error');
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+}
+
+function renderReminderResult(data) {
+    const body = document.getElementById('reminder-modal-body');
+    const title = document.getElementById('reminder-modal-title');
+    title.textContent = `Reminders Created — ${data.eventName}`;
+
+    // Hide confirm button, show just close
+    document.getElementById('confirm-reminders-btn').style.display = 'none';
+
+    let html = '';
+
+    // Summary bar
+    html += `<div class="reminder-summary-bar">
+    <span class="summary-stat summary-stat-ok">${data.summary.succeeded} created</span>
+    <span class="summary-stat summary-stat-skip">${data.summary.skipped} skipped</span>
+    ${data.summary.failed > 0 ? `<span class="summary-stat summary-stat-fail">${data.summary.failed} failed</span>` : ''}
+  </div>`;
+
+    // Drive folder link
+    if (data.driveFolderUrl) {
+        html += `<a href="${data.driveFolderUrl}" target="_blank" class="reminder-drive-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      </svg>
+      Open Drive Folder
+    </a>`;
+    }
+
+    // Per-round results
+    for (const round of data.rounds) {
+        const statusClass = round.skipped ? 'round-skipped' : round.errors.length > 0 ? 'round-error' : 'round-ok';
+        const statusIcon = round.skipped ? '⏭️' : round.errors.length > 0 ? '❌' : '✅';
+
+        html += `<div class="reminder-result-card ${statusClass}">
+      <div class="reminder-result-header">
+        <span>${statusIcon} ${escapeHtml(round.roundName)}</span>
+        ${round.skipped ? `<span class="skip-reason">${escapeHtml(round.skipReason || '')}</span>` : ''}
+      </div>
+      <div class="reminder-result-links">`;
+
+        if (round.driveFile) {
+            html += `<a href="${round.driveFile.fileUrl}" target="_blank" class="result-mini-link">📄 ${escapeHtml(round.driveFile.fileName)}</a>`;
+        }
+        if (round.calendarRoundEvent) {
+            html += `<a href="${round.calendarRoundEvent.eventUrl}" target="_blank" class="result-mini-link">📆 Round Event</a>`;
+        }
+        if (round.calendarReminderEvent) {
+            html += `<a href="${round.calendarReminderEvent.eventUrl}" target="_blank" class="result-mini-link">🔔 Send Reminder Event</a>`;
+        }
+        if (round.errors.length > 0) {
+            html += `<div class="round-errors">${round.errors.map(e => escapeHtml(e)).join('<br>')}</div>`;
+        }
+
+        html += `</div></div>`;
+    }
+
+    body.innerHTML = html;
+}
+
+function closeReminderModal() {
+    document.getElementById('reminder-modal').classList.add('hidden');
+    currentReminderDrafts = null;
+}
+

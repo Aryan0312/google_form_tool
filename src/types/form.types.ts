@@ -17,6 +17,7 @@ export interface FormSchema {
     minParticipants: number;
     maxParticipants: number;
     fields: FormField[];
+    rounds?: { name: string; date?: string; time?: string }[];
 }
 
 export interface GenerateRequest {

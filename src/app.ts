@@ -8,6 +8,7 @@ import { config } from './config';
 import generateRoute from './routes/generate.route';
 import formsRoute from './routes/forms.route';
 import authRoute from './routes/auth.route';
+import remindersRoute from './routes/reminders.route';
 import { errorHandler } from './middleware/error.middleware';
 
 // ─── Express App ────────────────────────────────────────────────────────────
@@ -62,6 +63,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/api/generate', generateRoute);
 app.use('/api/forms', formsRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/reminders', remindersRoute);
 
 // ─── Health Check ───────────────────────────────────────────────────────────
 

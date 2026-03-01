@@ -35,7 +35,10 @@ Extract the following from the raw text. If a field is not found, use "Not speci
       "2-3 members" → min=2, max=3
       Solo/Individual → min=1, max=1
   • Event Type: SOLO if max=1, TEAM if max>1
-  • Rounds / stages if mentioned
+  • Rounds / stages: Extract each as { name, date (YYYY-MM-DD if found), time (HH:mm if found) }
+      "Round 1: Online Quiz on March 15" → { name: "Online Quiz", date: "2026-03-15" }
+      "Final Pitch on April 2, 2pm" → { name: "Final Pitch", date: "2026-04-02", time: "14:00" }
+      If no explicit rounds → treat the entire event as one round using the event date
   • Themes / tracks if mentioned
   • Eligibility restrictions if mentioned
 
@@ -239,11 +242,19 @@ Return ONLY this JSON structure:
   "maxParticipants": <number>,
   "fields": [
     { "label": "<field label>", "type": "<SHORT_ANSWER|CHECKBOX|FILE_UPLOAD|SECTION_HEADER>", "required": <boolean>, "description": "<help text or empty string>" }
+  ],
+  "rounds": [
+    { "name": "<round name>", "date": "<YYYY-MM-DD or null>", "time": "<HH:mm or null>" }
   ]
 }
 
+ROUNDS RULES:
+  • If event has explicit rounds/stages, list each one.
+  • If event has no explicit rounds, create ONE round using the event name and event date.
+  • date format must be YYYY-MM-DD. If date cannot be determined, set to null.
+  • time format must be HH:mm (24h). If time cannot be determined, set to null.
+
 STABILITY RULES:
-  • This JSON schema is IMMUTABLE. Do not add, rename, or remove any top-level keys.
   • Every field object must have exactly: label, type, required, description.
   • type must be one of the four allowed values. No exceptions.
   • description value must be a plain-text string. No markdown, no HTML.
