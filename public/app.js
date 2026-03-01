@@ -44,14 +44,32 @@ async function checkAuthStatus() {
             badge.className = 'auth-badge connected';
             badge.querySelector('.auth-text').textContent = 'Google Connected';
             btn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Connected
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Disconnect
       `;
-            btn.disabled = true;
-            btn.style.opacity = '0.6';
+            btn.disabled = false;
+            btn.style.opacity = '';
+            btn.className = 'btn btn-outline btn-sm btn-disconnect';
+            btn.onclick = disconnectGoogle;
         } else {
             badge.className = 'auth-badge disconnected';
             badge.querySelector('.auth-text').textContent = 'Google Disconnected';
+            btn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          <polyline points="10 17 15 12 10 7" />
+          <line x1="15" y1="12" x2="3" y2="12" />
+        </svg>
+        Connect Google
+      `;
+            btn.disabled = false;
+            btn.style.opacity = '';
+            btn.className = 'btn btn-outline btn-sm';
+            btn.onclick = connectGoogle;
         }
     } catch (e) {
         console.error('Auth status check failed:', e);
@@ -69,6 +87,21 @@ async function connectGoogle() {
         }
     } catch (e) {
         showToast('Failed to connect to server.', 'error');
+    }
+}
+
+async function disconnectGoogle() {
+    try {
+        const res = await fetch('/api/auth/disconnect');
+        const data = await res.json();
+        if (data.success) {
+            showToast('Google account disconnected.', 'success');
+            checkAuthStatus();
+        } else {
+            showToast('Failed to disconnect.', 'error');
+        }
+    } catch (e) {
+        showToast('Failed to disconnect from server.', 'error');
     }
 }
 

@@ -6,23 +6,29 @@ import { RoundInfo, ReminderDraft } from '../types/reminder.types';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'llama-3.3-70b-versatile';
 
-// ─── System Prompt (<1000 tokens) ───────────────────────────────────────────
+// ─── System Prompt ──────────────────────────────────────────────────────────
 
-const REMINDER_SYSTEM_PROMPT = `You are a professional event coordinator writing reminder emails for college events.
+const REMINDER_SYSTEM_PROMPT = `You write official college reminder emails to students about upcoming third-party events.
+
+CONTEXT:
+- You are a college administration sending a reminder to students.
+- The event is organized by a third party, not the college.
+- The email is sent ONE DAY BEFORE the round.
+- Written in THIRD PERSON (the college addressing students).
 
 RULES:
-- Professional but friendly tone
-- Generic (not tied to any university)
-- Plain text only — no emojis, no markdown, no HTML
-- Under 400 words per email
-- Mention: round name, date, mode, venue (if available)
-- End with a clear call to action
-- Each email must feel unique, not templated
+- Official, respectful tone. No casualness.
+- Plain text only — no emojis, no markdown, no HTML.
+- Under 400 words.
+- Clearly state: round name, date (tomorrow), time, mode, venue (if available).
+- Remind students to be prepared and attend on time.
+- End with a professional sign-off like "Wishing you the best" or "We wish all participants good luck."
+- Do NOT mention the college name — keep it generic.
 
-Return a JSON object with a "reminders" key containing an array:
+Return a JSON object:
 { "reminders": [{ "roundName": "...", "roundDate": "...", "subject": "...", "body": "..." }] }
 
-Return ONLY the JSON object. No explanation, no code fences.`;
+ONE email per round. Return ONLY the JSON. No explanation.`;
 
 // ─── Generate Reminder Emails ───────────────────────────────────────────────
 
@@ -37,7 +43,7 @@ export async function generateReminderEmails(
 Rounds:
 ${JSON.stringify(rounds, null, 2)}
 
-Generate one reminder email per round.`;
+Generate ONE reminder email per round. Each email reminds students that the round is TOMORROW.`;
 
     const requestBody = {
         model: MODEL,
@@ -68,7 +74,7 @@ Generate one reminder email per round.`;
             console.log('🔄 Retrying reminder generation without response_format...');
             const retryBody = { ...requestBody } as any;
             delete retryBody.response_format;
-            retryBody.messages[0].content += '\n\nCRITICAL: Return ONLY raw JSON array. No code fences, no explanation.';
+            retryBody.messages[0].content += '\n\nCRITICAL: Return ONLY raw JSON object. No code fences, no explanation.';
 
             const retryResponse = await fetch(GROQ_API_URL, {
                 method: 'POST',
@@ -108,9 +114,7 @@ function parseReminderResponse(data: any): ReminderDraft[] {
     }
 
     let jsonStr = content.trim();
-    // Strip thinking tags
     jsonStr = jsonStr.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    // Strip code fences
     const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (fenceMatch) jsonStr = fenceMatch[1].trim();
 
@@ -127,7 +131,6 @@ function parseReminderResponse(data: any): ReminderDraft[] {
     if (Array.isArray(parsed)) {
         reminders = parsed;
     } else if (typeof parsed === 'object' && parsed !== null) {
-        // Try common keys first, then find any array
         for (const key of ['reminders', 'data', 'emails', 'results', ...Object.keys(parsed)]) {
             if (Array.isArray(parsed[key]) && parsed[key].length > 0) {
                 reminders = parsed[key];

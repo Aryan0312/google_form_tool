@@ -306,6 +306,16 @@ a {
   margin-top: 16px;
 }
 
+.btn-disconnect {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.btn-disconnect:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.08);
+}
+
 /* ─── Pages ────────────────────────────────────────────────────────────────── */
 
 .page {
@@ -1495,6 +1505,25 @@ a {
   background: rgba(139, 92, 246, 0.1);
   padding: 3px 10px;
   border-radius: 100px;
+}
+
+.reminder-type-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.type-reminder {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--accent-orange);
+}
+
+.type-eventday {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--accent-green);
 }
 
 .reminder-label {
