@@ -1,67 +1,93 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { config } from '../config';
+import crypto from 'crypto';
+import { Request } from 'express';
 
-// ─── OAuth2 Client Singleton ────────────────────────────────────────────────
+// ─── Session Type Extension ─────────────────────────────────────────────────
 
-let oauth2Client: OAuth2Client | null = null;
-let storedTokens: any = null;
-
-export function getOAuth2Client(): OAuth2Client {
-    if (!oauth2Client) {
-        oauth2Client = new google.auth.OAuth2(
-            config.google.clientId,
-            config.google.clientSecret,
-            config.google.redirectUri
-        );
-
-        // Restore tokens if we have them
-        if (storedTokens) {
-            oauth2Client.setCredentials(storedTokens);
-        }
+declare module 'express-session' {
+    interface SessionData {
+        oauthTokens?: any;
+        oauthState?: string;
     }
-    return oauth2Client;
 }
 
-// ─── Generate Auth URL ──────────────────────────────────────────────────────
+// ─── Create a fresh OAuth2 client per request ───────────────────────────────
 
-export function getAuthUrl(): string {
-    const client = getOAuth2Client();
+function createOAuth2Client(): OAuth2Client {
+    return new google.auth.OAuth2(
+        config.google.clientId,
+        config.google.clientSecret,
+        config.google.redirectUri
+    );
+}
+
+// ─── Generate Auth URL with CSRF State ──────────────────────────────────────
+
+export function getAuthUrl(req: Request): string {
+    const client = createOAuth2Client();
+    const state = crypto.randomBytes(32).toString('hex');
+    req.session.oauthState = state;
+
     return client.generateAuthUrl({
         access_type: 'offline',
         prompt: 'consent',
+        state,
         scope: [
             'https://www.googleapis.com/auth/forms.body',
         ],
     });
 }
 
-// ─── Handle OAuth Callback ──────────────────────────────────────────────────
+// ─── Handle OAuth Callback (validates state, stores tokens in session) ──────
 
-export async function handleAuthCallback(code: string): Promise<void> {
-    const client = getOAuth2Client();
+export async function handleAuthCallback(req: Request, code: string, state: string): Promise<void> {
+    // Validate CSRF state
+    if (!req.session.oauthState || req.session.oauthState !== state) {
+        throw new Error('Invalid OAuth state parameter. Possible CSRF attack.');
+    }
+
+    // Clear the state after validation
+    delete req.session.oauthState;
+
+    const client = createOAuth2Client();
     const { tokens } = await client.getToken(code);
-    client.setCredentials(tokens);
-    storedTokens = tokens;
-    console.log('✅ Google OAuth tokens acquired successfully.');
+    req.session.oauthTokens = tokens;
+    console.log('✅ Google OAuth tokens acquired for session.');
 }
 
-// ─── Check Auth Status ──────────────────────────────────────────────────────
+// ─── Check Auth Status (per session) ────────────────────────────────────────
 
-export function isAuthenticated(): boolean {
-    return storedTokens !== null;
+export function isAuthenticated(req: Request): boolean {
+    return !!req.session.oauthTokens;
 }
 
-// ─── Get Authenticated Client (throws if not authed) ────────────────────────
+// ─── Get Authenticated Client (reads tokens from session) ───────────────────
 
-export function getAuthenticatedClient(): OAuth2Client {
-    if (!storedTokens) {
+export function getAuthenticatedClient(req: Request): OAuth2Client {
+    if (!req.session.oauthTokens) {
         throw Object.assign(
             new Error('Not authenticated with Google. Please connect your Google account first.'),
             { statusCode: 401 }
         );
     }
-    const client = getOAuth2Client();
-    client.setCredentials(storedTokens);
+    const client = createOAuth2Client();
+    client.setCredentials(req.session.oauthTokens);
     return client;
+}
+
+// ─── Disconnect Google (revoke + clear session) ─────────────────────────────
+
+export async function disconnectGoogle(req: Request): Promise<void> {
+    if (req.session.oauthTokens) {
+        try {
+            const client = createOAuth2Client();
+            client.setCredentials(req.session.oauthTokens);
+            await client.revokeCredentials();
+        } catch (err) {
+            console.warn('⚠️ Token revocation failed (token may already be expired):', (err as Error).message);
+        }
+    }
+    delete req.session.oauthTokens;
 }

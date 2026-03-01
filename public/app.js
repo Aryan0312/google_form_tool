@@ -101,6 +101,12 @@ function toggleRequired(index) {
     renderChips();
 }
 
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 function renderChips() {
     const container = document.getElementById('chips-container');
     if (customFieldChips.length === 0) {
@@ -113,7 +119,7 @@ function renderChips() {
       <button class="chip-star" onclick="toggleRequired(${i})" title="${chip.required ? 'Click to make optional' : 'Click to make required'}">
         ${chip.required ? '★' : '☆'}
       </button>
-      <span class="chip-name">${chip.name}</span>
+      <span class="chip-name">${escapeHtml(chip.name)}</span>
       <span class="chip-tag">${chip.required ? 'Required' : 'Optional'}</span>
       <button class="chip-remove" onclick="removeField(${i})" title="Remove field">×</button>
     </div>

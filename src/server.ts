@@ -8,10 +8,11 @@ validateConfig();
 app.listen(config.port, () => {
   console.log(`
   ╔══════════════════════════════════════════════════╗
-  ║   🚀 Google Forms Generator                     ║
+  ║   🚀 FormForge AI                               ║
   ║   Running on http://localhost:${config.port}             ║
+  ║   Environment: ${(config.nodeEnv).padEnd(33)}║
   ║                                                  ║
-  ║   AI Model:  Llama 3.1 8B (via Groq)            ║
+  ║   AI Model:  Llama 3.3 70B (via Groq)           ║
   ║   Stage 1:   POST /api/generate                  ║
   ║   Stage 2:   POST /api/forms/create              ║
   ║   Auth:      GET  /api/auth/url                  ║

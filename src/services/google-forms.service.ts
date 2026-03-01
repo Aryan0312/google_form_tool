@@ -2,11 +2,12 @@ import { google } from 'googleapis';
 import { getAuthenticatedClient } from './google-auth.service';
 import { buildBatchUpdateRequests } from '../builders/form.builder';
 import { FormSchema, CreateFormResponse } from '../types/form.types';
+import { Request } from 'express';
 
 // ─── Create Google Form from Schema ─────────────────────────────────────────
 
-export async function createGoogleForm(schema: FormSchema): Promise<CreateFormResponse['data']> {
-    const auth = getAuthenticatedClient();
+export async function createGoogleForm(req: Request, schema: FormSchema): Promise<CreateFormResponse['data']> {
+    const auth = getAuthenticatedClient(req);
     const forms = google.forms({ version: 'v1', auth });
 
     //  Step 1: Create the form (title only — Google API limitation)
