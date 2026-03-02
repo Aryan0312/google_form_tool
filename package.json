@@ -9,6 +9,10 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/express-session": "^1.18.2",
+    "@types/node": "^22.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -16,13 +20,7 @@
     "express-session": "^1.19.0",
     "googleapis": "^140.0.1",
     "groq-sdk": "^0.8.0",
-    "helmet": "^8.1.0"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/express-session": "^1.18.2",
-    "@types/node": "^22.5.0",
+    "helmet": "^8.1.0",
     "typescript": "^5.5.4"
   }
 }
