@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service — FormForge AI</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="description" content="Terms of Service for FormForge AI — AI-Powered Event Form Generator">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .legal-page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .legal-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            transition: color var(--transition-fast);
+        }
+
+        .legal-back:hover {
+            color: var(--accent-purple);
+        }
+
+        .legal-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        .legal-updated {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .legal-section {
+            margin-bottom: 32px;
+        }
+
+        .legal-section h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .legal-section p,
+        .legal-section li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .legal-section ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .legal-section li {
+            margin-bottom: 6px;
+        }
+
+        .legal-contact {
+            color: var(--accent-purple);
+        }
+
+        .legal-contact:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                </div>
+                <span class="logo-text">FormForge<span class="logo-highlight">AI</span></span>
+            </a>
+        </div>
+    </header>
+
+    <main class="legal-page">
+        <a href="/" class="legal-back">← Back to Home</a>
+
+        <h1 class="legal-title">Terms of Service</h1>
+        <p class="legal-updated">Last updated: March 2, 2026</p>
+
+        <div class="legal-section">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing and using FormForge AI ("the app"), you agree to be bound by these Terms of Service. If you
+                do not
+                agree, please do not use the app.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Description of Service</h2>
+            <p>FormForge AI is a free, open-source tool that uses artificial intelligence to generate Google Forms,
+                Google
+                Drive reminder drafts, and Google Calendar events from event descriptions. The app acts on your behalf
+                using your
+                Google account credentials.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Google Account Authorization</h2>
+            <p>To use the app, you must authorize it to access certain Google services on your behalf. By connecting
+                your
+                Google account, you grant the app permission to:</p>
+            <ul>
+                <li>Create Google Forms in your account.</li>
+                <li>Create folders and text files in your Google Drive (within a "FormForge" folder).</li>
+                <li>Create events in your Google Calendar.</li>
+            </ul>
+            <p>You may revoke these permissions at any time through the app or through your Google Account settings.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. AI-Generated Content</h2>
+            <p>Form schemas, email drafts, and other content are generated by AI (Llama 3.3 70B via Groq). While we
+                strive for
+                accuracy:</p>
+            <ul>
+                <li>AI-generated content may contain errors or inaccuracies.</li>
+                <li>You are responsible for reviewing and editing all generated content before use.</li>
+                <li>The app provides a preview step so you can review and modify content before it is saved.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. User Responsibilities</h2>
+            <ul>
+                <li>You are responsible for all content you input into the app and all resources created in your Google
+                    account.</li>
+                <li>Do not use the app to generate forms or content that violate any laws or Google's Terms of Service.
+                </li>
+                <li>You are responsible for managing files and events created in your Drive and Calendar.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>6. Rate Limits</h2>
+            <p>To ensure fair usage and protect third-party API quotas, the app enforces rate limits:</p>
+            <ul>
+                <li>AI generation: 10 requests per 15 minutes.</li>
+                <li>Form creation: 20 requests per 15 minutes.</li>
+                <li>Reminder creation: 5 requests per 15 minutes.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>7. No Warranty</h2>
+            <p>The app is provided "as is" without warranty of any kind, express or implied. We do not guarantee that
+                the app
+                will be available at all times, error-free, or that AI-generated content will be accurate.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>8. Limitation of Liability</h2>
+            <p>In no event shall FormForge AI or its developers be liable for any indirect, incidental, special, or
+                consequential damages arising from the use or inability to use the app.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>9. Changes to Terms</h2>
+            <p>We may update these terms from time to time. Continued use of the app after changes constitutes
+                acceptance of
+                the updated terms.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>10. Contact</h2>
+            <p>For questions about these terms, contact us at:</p>
+            <p><a href="mailto:aryan26zzz@gmail.com" class="legal-contact">aryan26zzz@gmail.com</a></p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">
+            Built with <span class="footer-heart">♥</span> using Llama 3.3 70B · Google Forms API · Node.js
+        </p>
+        <p class="footer-sub">FormForgeAI — Open source, free forever.</p>
+    </footer>
+</body>
+
+</html>

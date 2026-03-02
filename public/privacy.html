@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — FormForge AI</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="description" content="Privacy Policy for FormForge AI — AI-Powered Event Form Generator">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .legal-page {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .legal-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            transition: color var(--transition-fast);
+        }
+
+        .legal-back:hover {
+            color: var(--accent-purple);
+        }
+
+        .legal-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        .legal-updated {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .legal-section {
+            margin-bottom: 32px;
+        }
+
+        .legal-section h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .legal-section p,
+        .legal-section li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .legal-section ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .legal-section li {
+            margin-bottom: 6px;
+        }
+
+        .legal-highlight {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 18px 22px;
+            margin-top: 12px;
+        }
+
+        .legal-highlight p {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .legal-contact {
+            color: var(--accent-purple);
+        }
+
+        .legal-contact:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-grid"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                </div>
+                <span class="logo-text">FormForge<span class="logo-highlight">AI</span></span>
+            </a>
+        </div>
+    </header>
+
+    <main class="legal-page">
+        <a href="/" class="legal-back">← Back to Home</a>
+
+        <h1 class="legal-title">Privacy Policy</h1>
+        <p class="legal-updated">Last updated: March 2, 2026</p>
+
+        <div class="legal-section">
+            <h2>1. Overview</h2>
+            <p>FormForge AI ("we", "our", "the app") is an open-source, AI-powered tool that helps users generate Google
+                Forms, Google Drive drafts, and Google Calendar events from raw event descriptions. This Privacy Policy
+                explains
+                what data we access, how we use it, and how we protect it.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Data We Access</h2>
+            <p>When you connect your Google account, we request access to the following scopes:</p>
+            <ul>
+                <li><strong>Google Forms API</strong> (<code>forms.body</code>) — to create and configure Google Forms
+                    on your
+                    behalf.</li>
+                <li><strong>Google Drive API</strong> (<code>drive.file</code>) — to create folders and save reminder
+                    email
+                    drafts as text files. We can <em>only</em> access files created by this app.</li>
+                <li><strong>Google Calendar API</strong> (<code>calendar.events</code>) — to create calendar events and
+                    reminder
+                    entries for event rounds.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Data We Do NOT Collect</h2>
+            <div class="legal-highlight">
+                <p>We do NOT store, log, or transmit any of your personal data, Google account information, or event
+                    content to
+                    any external server or database. All processing happens in-session and is discarded when you close
+                    the app or
+                    disconnect.</p>
+            </div>
+            <ul>
+                <li>We do <strong>not</strong> store your Google OAuth tokens on disk or in a database. Tokens are held
+                    in
+                    server-side session memory only.</li>
+                <li>We do <strong>not</strong> read, modify, or delete any pre-existing files in your Google Drive.</li>
+                <li>We do <strong>not</strong> access any Google Calendar data beyond events created by this app.</li>
+                <li>We do <strong>not</strong> collect analytics, tracking cookies, or usage telemetry.</li>
+                <li>We do <strong>not</strong> share your data with any third parties.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Third-Party Services</h2>
+            <p>The app uses the following third-party services:</p>
+            <ul>
+                <li><strong>Groq API</strong> — Event text is sent to the Groq AI API (running Llama 3.3 70B) to
+                    generate form
+                    schemas and reminder email drafts. Groq's privacy policy applies to data processed by their API.
+                </li>
+                <li><strong>Google APIs</strong> — Google Forms, Drive, and Calendar APIs are used to create resources
+                    in your
+                    Google account. Google's privacy policy applies.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. Session & Authentication</h2>
+            <p>We use server-side sessions to temporarily store your Google OAuth tokens during your active session.
+                These
+                tokens are:</p>
+            <ul>
+                <li>Stored in server memory only (not in a database).</li>
+                <li>Automatically cleared when the session expires or when you click "Disconnect".</li>
+                <li>Never logged, exported, or shared.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>6. Data Retention</h2>
+            <p>We retain zero persistent user data. When you disconnect your Google account or your session expires, all
+                tokens and session data are permanently deleted from server memory. Files created in your Google Drive
+                and
+                Calendar remain in your account under your full control.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>7. Security</h2>
+            <p>We implement the following security measures:</p>
+            <ul>
+                <li>HTTPS-only in production.</li>
+                <li>Helmet.js security headers.</li>
+                <li>CSRF protection via OAuth <code>state</code> parameter validation.</li>
+                <li>Rate limiting on all API endpoints.</li>
+                <li>Minimal OAuth scopes (<code>drive.file</code> instead of full Drive access).</li>
+                <li>Input validation and sanitization on all user inputs.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>8. Your Rights</h2>
+            <p>You can revoke FormForge AI's access to your Google account at any time:</p>
+            <ul>
+                <li>Click the <strong>"Disconnect"</strong> button in the app header, or</li>
+                <li>Visit <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener"
+                        class="legal-contact">Google Account Permissions</a> and remove FormForge AI.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>9. Open Source</h2>
+            <p>FormForge AI is open source. You can review the complete source code to verify our data handling
+                practices.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>10. Contact</h2>
+            <p>For questions or concerns about this privacy policy, contact us at:</p>
+            <p><a href="mailto:aryan26zzz@gmail.com" class="legal-contact">aryan26zzz@gmail.com</a></p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">
+            Built with <span class="footer-heart">♥</span> using Llama 3.3 70B · Google Forms API · Node.js
+        </p>
+        <p class="footer-sub">FormForgeAI — Open source, free forever.</p>
+    </footer>
+</body>
+
+</html>
