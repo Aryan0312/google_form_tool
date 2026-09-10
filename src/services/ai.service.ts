@@ -5,7 +5,7 @@ import { STAGE1_SYSTEM_PROMPT, buildStage1UserPrompt } from '../prompts/stage1.p
 // ─── Groq API Config ────────────────────────────────────────────────────────
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.3-70b-versatile';
+const MODEL = 'openai/gpt-oss-120b';
 
 // ─── Stage 1: Parse Event Text → FormSchema ────────────────────────────────
 
